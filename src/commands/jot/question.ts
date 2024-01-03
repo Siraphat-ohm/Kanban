@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 export const subjectQuestion = async (msg_input: Jot, interaction: CommandInteraction, isFirstAttempt: boolean): Promise<void> => {
     const subjects = ['Math', 'Science', 'English', 'History'];
     const promptMessage = isFirstAttempt 
-        ? 'What subject is this for?'
+        ? 'What subject is this for? should be one of the following: Math, Science, English, History'
         : 'Subject should be one of the following: Math, Science, English, History. Please try again.';
 
     await interaction[isFirstAttempt ? 'reply' : 'editReply'](promptMessage);
@@ -23,6 +23,7 @@ export const subjectQuestion = async (msg_input: Jot, interaction: CommandIntera
             await subjectQuestion(msg_input, interaction, false);
         }
     } catch (error) {
+        console.log(error);
         await interaction.followUp('Failed to get a valid response in time. Please try the command again.');
     }
 }
@@ -47,6 +48,7 @@ export const descriptionQuestion = async (msg_input: Jot, interaction: CommandIn
             await descriptionQuestion(msg_input, interaction, false);
         }
     } catch (error) {
+        console.log(error);
         await interaction.followUp('Failed to get a valid response in time. Please try the command again.');
     }
 }
@@ -57,7 +59,6 @@ export const createAtQuestion = async (msg_input: Jot, interaction: CommandInter
         : 'Try again. Format should be DD/MM/YY';
 
     await interaction.editReply(promptMessage);
-
     try {
         const filter = (m: any) => m.author.id === interaction.user.id;
         const collection = await interaction.channel?.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] });
@@ -95,6 +96,7 @@ export const dueDateQuestion = async (msg_input: Jot, interaction: CommandIntera
             await dueDateQuestion(msg_input, interaction, false);
         }
     } catch (error) {
+        console.log(error);
         await interaction.followUp('Failed to get a valid response in time. Please try the command again.');
     }
 }
@@ -171,6 +173,7 @@ export const confirmQuestion = async (msg_input: Jot, interaction: CommandIntera
             await confirmQuestion(msg_input, interaction, false);
         }
     } catch (error) {
+        console.log(error);
         await interaction.followUp('Failed to get a valid response in time. Please try the command again.');
     }
 }

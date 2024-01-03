@@ -1,9 +1,10 @@
-import { ChannelFlags, ChannelManager, ChannelType, CommandInteraction, OverwriteType, OverwrittenMimeTypes, PermissionOverwriteManager, PermissionOverwrites } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { Jot } from "../../interfaces/jot.interface";
 import { confirmQuestion, createAtQuestion, descriptionQuestion, dueDateQuestion, isExamQuestion, subjectQuestion } from "./question";
 import generateId from "../../utils/generateId";
 import { prisma } from "../../utils/prisma";
 import dayjs from "dayjs";
+import finished from "../../utils/finished";
 
 const jot = async (interaction: CommandInteraction) => {
     try {
@@ -19,18 +20,19 @@ const jot = async (interaction: CommandInteraction) => {
         if ( !confirm ) {
             await interaction.channel!.send('Cancelled');
             return;
+        } else {
+            await prisma.homework.create( {
+                data: {
+                    id: generateId(),
+                    description: msg_input.description,
+                    subject: msg_input.subject,
+                    isExam: msg_input.is_exam,
+                    dueDate: new Date(dayjs(msg_input.due_date).format('YYYY-MM-DD'))
+                }
+            });
+            await interaction.channel!.send('Homework created successfully!');
+            await finished(interaction);
         }
-        await prisma.homework.create( {
-            data: {
-                id: generateId(),
-                description: msg_input.description,
-                subject: msg_input.subject,
-                isExam: msg_input.is_exam,
-                dueDate: new Date(dayjs(msg_input.due_date).format('YYYY-MM-DD'))
-            }
-        });
-
-        await interaction.channel!.send('Homework created successfully!');
 
     } catch (e) {
         console.log(e);

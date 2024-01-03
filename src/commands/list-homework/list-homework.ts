@@ -1,7 +1,7 @@
 import { CommandInteraction, Embed, EmbedBuilder } from "discord.js";
 import { prisma } from "../../utils/prisma";
 import dayjs from "dayjs";
-
+import finished from "../../utils/finished";
 
 const listHomework = async(interaction: CommandInteraction) => {
     try {
@@ -38,8 +38,10 @@ const listHomework = async(interaction: CommandInteraction) => {
                 embeds.push(embed);
             }
             await interaction.channel?.send({ embeds: embeds });
+            await finished(interaction);
         } else {
             await interaction.channel?.send('No homework found');
+            await finished(interaction);
         }
         
     } catch (e) {

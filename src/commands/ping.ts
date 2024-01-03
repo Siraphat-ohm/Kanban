@@ -1,7 +1,11 @@
 import { CommandInteraction } from "discord.js";
 
 const ping = async (interaction: CommandInteraction) => {
-    await interaction.reply('Pong!');
+    try {
+        await interaction.reply({ content: 'Pong!' });
+    } catch (e) {
+        
+    }
 };
 
 export default ping;
