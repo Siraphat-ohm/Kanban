@@ -1,10 +1,13 @@
 {
   "dependencies": {
+    "@prisma/client": "^5.7.1",
     "dayjs": "^1.11.10",
     "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.7",
     "prisma": "^5.7.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

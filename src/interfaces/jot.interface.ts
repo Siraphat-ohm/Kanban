@@ -1,6 +1,7 @@
 export interface Jot {
-    subject: string | null;
-    description: string | null;
-    due_date: string | null;
-    is_exam: boolean | null;
+    subject: string;
+    description: string 
+    due_date: string;
+    is_exam: boolean ;
+    create_at: string;
 }
