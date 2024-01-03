@@ -68,8 +68,11 @@ export const dueDateQuestion = async (msg_input: Jot, interaction: CommandIntera
     try {
         const dueDate = await getUserInput(interaction, 'What\'s the due date? format should be DD/MM/YY', 'followUp');
         const isValid = isValidDateFormat(dueDate)
-        if (dueDate && isValid) {
-            msg_input.dueDate = dayjs(dueDate).format('YYYY-MM-DD');
+        const diff = dayjs(dueDate).diff(dayjs(), 'day') > 0;
+        const dueDateDayjs = dayjs(dueDate).format('YYYY-MM-DD');
+        
+        if (dueDate && isValid && diff) {
+            msg_input.dueDate = dueDateDayjs; 
         } else {
             await dueDateQuestion(msg_input, interaction, false);
         }
