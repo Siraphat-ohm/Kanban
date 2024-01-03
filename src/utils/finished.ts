@@ -3,7 +3,7 @@ import { CommandInteraction, DefaultDeviceProperty } from "discord.js";
 
 const finished = async(interaction: CommandInteraction) => {
     try {
-        const promptMessage = 'Are you done with this channel? (y/n) for delete this channel.';
+        const promptMessage = 'Are you done with this channel? (yes/no) for delete this channel.';
         await interaction.channel?.send(promptMessage);
         const filter = (m: any) => m.author.id === interaction.user.id;
         const collection = await interaction.channel?.awaitMessages({  filter, max: 1, time: 60000, errors: ['time'] });

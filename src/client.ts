@@ -1,31 +1,35 @@
-import { ChannelType, Client, GatewayIntentBits, ShardingManager } from "discord.js";
-import ping from "./commands/ping";
+import { Client, GatewayIntentBits } from "discord.js";
 import { REST, Routes } from 'discord.js';
 import dotenv from 'dotenv';
 import { Command } from "./interfaces/command.interface";
-import jot from "./commands/jot/jot";
-import listHomework from "./commands/list-homework/list-homework";
-import edit from "./commands/edit/edit-homework";
-import delay from "./utils/delay";
 
 dotenv.config();
 
 const commands: Command[] = [
     {
         name: 'ping',
-        description: 'Replies with Pong!'
+        description: 'Replies with Pong!',
+        cooldown: 5,
     },
     {
         name: 'jot',
         description: 'Jot down a note!',
+        cooldown: 120
     },
     {
         name: 'list-homework',
         description: 'List all homework',
+        cooldown: 5
     },
     {
         name: 'edit',
         description: 'Edit a note!',
+        cooldown: 120
+    },
+    {
+        name: 'test',
+        description: 'Test command',
+        cooldown: 5
     }
 ];
 

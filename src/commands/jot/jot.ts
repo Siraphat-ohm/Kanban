@@ -1,10 +1,10 @@
 import { CommandInteraction } from "discord.js";
 import { Jot } from "../../interfaces/jot.interface";
-import { confirmQuestion, createAtQuestion, descriptionQuestion, dueDateQuestion, isExamQuestion, subjectQuestion } from "./question";
-import generateId from "../../utils/generateId";
+import { confirmQuestion, descriptionQuestion, dueDateQuestion, isExamQuestion, subjectQuestion } from "./question";
+import finished from "../../utils/finished";
 import { prisma } from "../../utils/prisma";
 import dayjs from "dayjs";
-import finished from "../../utils/finished";
+import generateId from "../../utils/generateId";
 
 const jot = async (interaction: CommandInteraction) => {
     try {
@@ -13,7 +13,6 @@ const jot = async (interaction: CommandInteraction) => {
 
         await subjectQuestion( msg_input, interaction, true );
         await descriptionQuestion( msg_input, interaction, true );
-        await createAtQuestion( msg_input, interaction, true );
         await dueDateQuestion( msg_input, interaction, true );
         await isExamQuestion( msg_input, interaction, true );
         const confirm = await confirmQuestion( msg_input, interaction, true );
@@ -26,11 +25,11 @@ const jot = async (interaction: CommandInteraction) => {
                     id: generateId(),
                     description: msg_input.description,
                     subject: msg_input.subject,
-                    isExam: msg_input.is_exam,
-                    dueDate: new Date(dayjs(msg_input.due_date).format('YYYY-MM-DD'))
+                    isExam: msg_input.isExam,
+                    dueDate: new Date(dayjs(msg_input.dueDate).format('YYYY-MM-DD'))
                 }
             });
-            await interaction.channel!.send('Homework created successfully!');
+            await interaction.followUp('Home work created.');
             await finished(interaction);
         }
 

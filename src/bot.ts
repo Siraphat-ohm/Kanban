@@ -6,11 +6,13 @@ import jot from './commands/jot/jot';
 import listHomework from './commands/list-homework/list-homework';
 import ping from './commands/ping';
 import delay from './utils/delay';
+import isValidDateFormat from './utils/isValidDateFormat';
+import getUserInput from './utils/getUserInput';
+import TumKanban from './utils/notification';
 
 dotenv.config();
 
 const client = createClient();
-// manage sharding
 
 client.on('ready', () => {
     client.user?.setActivity({
@@ -18,6 +20,11 @@ client.on('ready', () => {
         type: ActivityType.Playing
     });
     console.log(`Logged in as ${client.user?.tag}!`);
+    
+    // setInterval( async() => {
+        // await TumKanban(client);
+    // }, 10000 );
+
 });
 
 
@@ -94,6 +101,11 @@ client.on('interactionCreate', async(interaction) => {
                 break;
             case 'edit':
                 edit(interaction);
+                break;
+            case 'test':
+                await interaction.reply('test');
+                const date_input = await getUserInput(interaction, 'When was this created? format should be DD/MM/YY', 'followUp');
+                isValidDateFormat(date_input);
                 break;
             default:
                 break;
