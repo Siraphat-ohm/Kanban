@@ -3,13 +3,13 @@ import { Jot } from "../../interfaces/jot.interface";
 import dayjs from "dayjs";
 import getUserInput from "../../utils/getUserInput";
 import isValidDateFormat from "../../utils/isValidDateFormat";
+import { prisma } from "../../utils/prisma";
 
 export const subjectQuestion = async (msg_input: Jot, interaction: CommandInteraction, isFirstAttempt: boolean): Promise<void> => {
     const subjects = ['Math', 'Science', 'English', 'History'];
     if ( !isFirstAttempt ) await interaction.editReply('Please try again.')
-
     try {
-        const subject = await getUserInput(interaction, 'What subject is this for? should be one of the following: Math, Science, English, History', 'reply');
+        const subject = await getUserInput(interaction, 'What subject is this for? should be one of the following: Math, Science, English, History', 'followUp');
 
         if (subject && subjects.includes(subject)) {
             msg_input.subject = subject;
@@ -19,6 +19,7 @@ export const subjectQuestion = async (msg_input: Jot, interaction: CommandIntera
     } catch (e) {
         console.log(e);
         await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
     }
 }
 
@@ -36,6 +37,7 @@ export const descriptionQuestion = async (msg_input: Jot, interaction: CommandIn
     } catch (e) {
         console.log(e);
         await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
     }
 }
 
@@ -79,6 +81,7 @@ export const dueDateQuestion = async (msg_input: Jot, interaction: CommandIntera
     } catch (e) {
         console.log(e);
         await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
     }
 }
 
@@ -95,6 +98,7 @@ export const isExamQuestion = async (msg_input: Jot, interaction: CommandInterac
         }
     } catch (e) {
         await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
     }
 }
 
@@ -133,5 +137,41 @@ export const confirmQuestion = async (msg_input: Jot, interaction: CommandIntera
     } catch (e) {
         console.log(e);
         await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
+    }
+}
+
+export const roleQuestion = async (interaction: CommandInteraction, isFirstAttempt: boolean) => {
+    try {
+        if ( !isFirstAttempt ) await interaction.editReply('Please try again. enter (yes/no).')
+        const foundRole = await prisma.role.findFirst({ where: {
+            createBy: interaction.user.id,    
+            } })
+        if ( !foundRole ) {
+            await interaction.channel?.send('Please assign  role.');
+            const role = await getUserInput(interaction, 'What role do you want to assign?', 'followUp');
+            const regex = /<@&[0-9]+>/g;
+            const match = role.match(regex);
+            if ( !match ) {
+                await roleQuestion(interaction, false);
+            }
+            const roleId = match?.[0].replace(/<@&/g, '').replace(/>/g, '') as string;
+            const roleName = interaction.guild?.roles.cache.find(role => role.id === roleId)?.name;
+            await prisma.role.create({
+                data: {
+                    id: roleId,
+                    name: roleName as string,
+                    createBy: interaction.user.id
+                }
+            });
+
+            return roleId;
+            
+        }
+
+        return foundRole.id;
+    } catch (e) {
+        await interaction.channel?.send('Failed to get a valid response in time. Please try the command again.');
+        throw e;
     }
 }

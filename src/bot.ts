@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import createClient from './client';
-import { ActivityType, ChannelType, ShardingManager } from 'discord.js';
+import { ActivityType, ChannelType, Guild, ShardingManager } from 'discord.js';
 import edit from './commands/edit/edit-homework';
 import jot from './commands/jot/jot';
 import listHomework from './commands/list-homework/list-homework';
@@ -9,6 +9,7 @@ import delay from './utils/delay';
 import isValidDateFormat from './utils/isValidDateFormat';
 import getUserInput from './utils/getUserInput';
 import TumKanban from './utils/notification';
+import { GUILD_ID } from './utils/constant'
 
 dotenv.config();
 
@@ -21,9 +22,9 @@ client.on('ready', () => {
     });
     console.log(`Logged in as ${client.user?.tag}!`);
     
-    // setInterval( async() => {
-        // await TumKanban(client);
-    // }, 10000 );
+    setInterval( async() => {
+        await TumKanban(client, GUILD_ID);
+    }, 6000 );
 
 });
 
@@ -35,9 +36,6 @@ client.on('interactionCreate', async(interaction) => {
 
     if ( !interaction.guild ) return;
     if ( !interaction.channel ) return;
-
-    if ( commandName === 'stats' ){
-    }
 
     const channelName = `jot-${interaction.user.id}`;
 
@@ -88,6 +86,8 @@ client.on('interactionCreate', async(interaction) => {
         await delay(3000);
         await interaction.deleteReply();
     } else {
+
+        // assign role before doing anything
             
         switch (commandName) {
             case 'ping':

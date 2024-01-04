@@ -21,15 +21,15 @@ model homework {
   description String
   dueDate DateTime
   isExam Boolean
-  status Status @default(NOT_STARTED)
   createAt DateTime @default(now())
-  user user[]
+  role_id String
+  role role @relation(fields: [role_id], references: [id])
 }
 
-model user {
+model role {
   id String @id
-  username String
-  discordId String
+  name String
   createAt DateTime @default(now())
+  createBy String
   homework homework[]
 }

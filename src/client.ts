@@ -1,9 +1,8 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { REST, Routes } from 'discord.js';
-import dotenv from 'dotenv';
 import { Command } from "./interfaces/command.interface";
+import { CLIENT_ID, GUILD_ID, TOKEN } from './utils/constant'
 
-dotenv.config();
 
 const commands: Command[] = [
     {
@@ -33,9 +32,6 @@ const commands: Command[] = [
     }
 ];
 
-const TOKEN = process.env.TOKEN as string;
-const CLIENT_ID = process.env.CLIENT_ID as string;
-const GUILD_ID = process.env.GUILD_ID as string;
 
 const register_commands = (TOKEN: string, CLIENT_ID: string, GUILD_ID: string, commands: Command[]) => {
     const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -63,6 +59,7 @@ const createClient = () => {
                             GatewayIntentBits.Guilds,
                             GatewayIntentBits.GuildMessages,
                             GatewayIntentBits.MessageContent,
+                            GatewayIntentBits.GuildMembers
                         ] 
     });
 
