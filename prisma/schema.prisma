@@ -10,26 +10,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  DONE
-  NOT_STARTED
+model Guild {
+  id String @id
+  role Role[]
 }
 
-model homework {
+model Task {
   id String @id
-  subject String
+  subjectId String
+  subject Subject @relation( fields: [subjectId], references: [id] )
   description String
   dueDate DateTime
   isExam Boolean
+  roleId String
+  role Role @relation( fields: [roleId], references: [id] )
   createAt DateTime @default(now())
-  role_id String
-  role role @relation(fields: [role_id], references: [id])
 }
 
-model role {
+model Role {
   id String @id
   name String
-  createAt DateTime @default(now())
+  task Task[]
+  guildId String
+  guild Guild @relation( fields: [guildId], references: [id] )
   createBy String
-  homework homework[]
+  createAt DateTime @default(now())
+}
+
+model Subject {
+  id String @id
+  name String
+  tasks Task[]
 }

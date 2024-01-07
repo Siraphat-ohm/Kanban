@@ -1,15 +1,10 @@
 import dotenv from 'dotenv';
 import createClient from './client';
-import { ActivityType, ChannelType, Guild, ShardingManager } from 'discord.js';
-import edit from './commands/edit/edit-homework';
-import jot from './commands/jot/jot';
-import listHomework from './commands/list-homework/list-homework';
-import ping from './commands/ping';
-import delay from './utils/delay';
-import isValidDateFormat from './utils/isValidDateFormat';
-import getUserInput from './utils/getUserInput';
-import TumKanban from './utils/notification';
-import { GUILD_ID } from './utils/constant'
+import { ActivityType, ChannelType, GuildBasedChannel } from 'discord.js';
+import { handleCommands } from './commands/handleCommand';
+import logger from './utils/common/logger';
+import delay from './utils/common/delay';
+
 
 dotenv.config();
 
@@ -20,29 +15,18 @@ client.on('ready', () => {
         name: 'FUCK',
         type: ActivityType.Playing
     });
-    console.log(`Logged in as ${client.user?.tag}!`);
-    
-    setInterval( async() => {
-        await TumKanban(client, GUILD_ID);
-    }, 6000 );
-
+    logger.info(`Logged in as ${client.user?.tag}!`) 
 });
 
-
 client.on('interactionCreate', async(interaction) => {
-    if (!interaction.isCommand()) return;
+    if ( !interaction.isCommand() || !interaction.guild || !interaction.channel ) return;
 
-    const { commandName } = interaction;
-
-    if ( !interaction.guild ) return;
-    if ( !interaction.channel ) return;
-
-    const channelName = `jot-${interaction.user.id}`;
+    const channelName = `jot-${interaction.user.displayName}`;
 
     let cat ;
 
     cat = interaction.guild!.channels.cache.find( 
-        ( c: any ) => {
+        ( c: GuildBasedChannel ) => {
             return ( ( c.name as string ).toLowerCase() === 'jot' ) && c.type === ChannelType.GuildCategory
         }
     );
@@ -76,44 +60,19 @@ client.on('interactionCreate', async(interaction) => {
             ],
         });
         await interaction.reply(`Your jot channel: <#${channel.id}> has been created. Please click on the channel to join.`);
-
-    } else {
-
-    if ( !interaction.guild ) return;
-
-    if ( interaction.channel?.id !== foundChannel?.id ) {
-        await interaction.reply(`Your jot channel: <#${foundChannel?.id}> is ${interaction.user}`);
         await delay(3000);
         await interaction.deleteReply();
-    } else {
 
-        // assign role before doing anything
-            
-        switch (commandName) {
-            case 'ping':
-                await ping(interaction);
-                break;
-            case 'jot':
-                jot(interaction);
-                break;
-            case 'list-homework':
-                listHomework(interaction);
-                break;
-            case 'edit':
-                edit(interaction);
-                break;
-            case 'test':
-                await interaction.reply('test');
-                const date_input = await getUserInput(interaction, 'When was this created? format should be DD/MM/YY', 'followUp');
-                isValidDateFormat(date_input);
-                break;
-            default:
-                break;
+     }  else {
+        if ( interaction.channel?.id !== foundChannel?.id ) {
+            await interaction.reply(`Your jot channel: <#${foundChannel?.id}> is ${interaction.user}`);
+            await delay(3000);
+            await interaction.deleteReply();
+        } else {
+            const { commandName } = interaction;
+            await handleCommands( commandName, interaction );
         }
-
     }
-        
-}});
-
+});
 
 client.login(process.env.TOKEN);
