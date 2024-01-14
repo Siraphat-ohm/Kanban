@@ -1,21 +1,36 @@
 import dotenv from 'dotenv';
 import createClient from './client';
 import { ActivityType, ChannelType, GuildBasedChannel } from 'discord.js';
-import { handleCommands } from './commands/handleCommand';
+import { handleCommands, registerCommands } from './commands/handleCommand';
 import logger from './utils/common/logger';
 import delay from './utils/common/delay';
-
+import { prisma } from './utils/prismaClient';
+import {  TOKEN } from './utils/common/constants';
 
 dotenv.config();
 
 const client = createClient();
 
-client.on('ready', () => {
-    client.user?.setActivity({
-        name: 'FUCK',
-        type: ActivityType.Playing
-    });
-    logger.info(`Logged in as ${client.user?.tag}!`) 
+client.on('ready', async() => {
+    try {
+        client.user?.setActivity('jot', { type: ActivityType.Listening });
+        logger.info(`Logged in as ${client.user?.tag}!`);
+    } catch (e) {
+        logger.error(e); 
+    }
+});
+
+client.on('guildCreate', async(guild) => {
+    try {
+        const foundGuild = await prisma.guild.findUnique({ where: { id: guild.id } })
+        if ( !foundGuild ) {
+            await prisma.guild.create({ data: { id: guild.id, name: guild.name } })
+            logger.info(`Created guild ${guild.name}`)
+        }
+
+    } catch (e) {
+        logger.error(e);
+    }
 });
 
 client.on('interactionCreate', async(interaction) => {
@@ -23,9 +38,7 @@ client.on('interactionCreate', async(interaction) => {
 
     const channelName = `jot-${interaction.user.displayName}`;
 
-    let cat ;
-
-    cat = interaction.guild!.channels.cache.find( 
+    let cat = interaction.guild!.channels.cache.find( 
         ( c: GuildBasedChannel ) => {
             return ( ( c.name as string ).toLowerCase() === 'jot' ) && c.type === ChannelType.GuildCategory
         }
@@ -62,8 +75,7 @@ client.on('interactionCreate', async(interaction) => {
         await interaction.reply(`Your jot channel: <#${channel.id}> has been created. Please click on the channel to join.`);
         await delay(3000);
         await interaction.deleteReply();
-
-     }  else {
+     } else {
         if ( interaction.channel?.id !== foundChannel?.id ) {
             await interaction.reply(`Your jot channel: <#${foundChannel?.id}> is ${interaction.user}`);
             await delay(3000);
@@ -75,4 +87,4 @@ client.on('interactionCreate', async(interaction) => {
     }
 });
 
-client.login(process.env.TOKEN);
+client.login(TOKEN);

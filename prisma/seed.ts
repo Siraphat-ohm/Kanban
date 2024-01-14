@@ -1,11 +1,13 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from '@prisma/client';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient();
 
 const main = async() => {
-    const subjects: Prisma.SubjectCreateInput[] = [
+    const subjects = [
         {
-            id: '1',
+            id: '1175838456270823434',
             name: 'ภาษาไทย'
         },
         {
@@ -54,7 +56,15 @@ const main = async() => {
         },
     ]
 
-    await prisma.subject.createMany({ data: subjects })
+    const subjectsData: Prisma.SubjectCreateManyInput[] = subjects.map( subject => {
+        return {
+            id: subject.id,
+            name: subject.name,
+            guildId: process.env.GUILD_ID as string
+        }
+    })
+
+    await prisma.subject.createMany({ data: subjectsData })
 }
 
 main()

@@ -12,7 +12,10 @@ datasource db {
 
 model Guild {
   id String @id
-  role Role[]
+  name String
+  subject Subject[]
+  tasks Task[]
+  createAt DateTime @default(now())
 }
 
 model Task {
@@ -22,23 +25,15 @@ model Task {
   description String
   dueDate DateTime
   isExam Boolean
-  roleId String
-  role Role @relation( fields: [roleId], references: [id] )
   createAt DateTime @default(now())
-}
-
-model Role {
-  id String @id
-  name String
-  task Task[]
   guildId String
   guild Guild @relation( fields: [guildId], references: [id] )
-  createBy String
-  createAt DateTime @default(now())
 }
 
 model Subject {
   id String @id
   name String
   tasks Task[]
+  guildId String
+  guild Guild @relation( fields: [guildId], references: [id] )
 }
